@@ -1,0 +1,37 @@
+name: PHP CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your default branch if needed
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Specifies the runner environment
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 'latest'  # Use the latest PHP version
+
+      # Remove this step if you're not using Composer
+      - name: Install dependencies
+        run: composer install  # Install PHP dependencies using Composer
+
+      # Optional: Only include this if you have PHPUnit tests
+      - name: Run tests
+        run: vendor/bin/phpunit  # Run PHPUnit tests
+
+      - name: Deploy
+        run: |
+          echo "Deploying to Apache server..."
+          rsync -avz --delete-after --exclude='.git' ./ ubuntu@${{ secrets.SERVER_IP }}:/var/www/html/UserManagement/
+    env:
+      SERVER_IP: ${{ secrets.SERVER_IP }}
