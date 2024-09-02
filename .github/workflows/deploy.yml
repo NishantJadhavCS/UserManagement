@@ -20,9 +20,12 @@ jobs:
 
     - name: Add SSH host key
       run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H 52.66.20.249 >> ~/.ssh/known_hosts
-        cat ~/.ssh/known_hosts
+            mkdir -p ~/.ssh
+            ssh-keyscan -H 52.66.20.249 >> ~/.ssh/known_hosts
+            echo "Host 52.66.20.249" >> ~/.ssh/config
+            echo "    HostkeyAlgorithms +ssh-rsa,ssh-dss" >> ~/.ssh/config
+            echo "    PubkeyAcceptedAlgorithms +ssh-rsa,ssh-dss" >> ~/.ssh/config
+            cat ~/.ssh/known_hosts
 
     - name: Deploy files to server
       run: |
