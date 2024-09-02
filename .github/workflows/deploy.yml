@@ -18,19 +18,10 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Add SSH host key
-      run: |
-            mkdir -p ~/.ssh
-            ssh-keyscan -H 52.66.20.249 >> ~/.ssh/known_hosts
-            echo "Host 52.66.20.249" >> ~/.ssh/config
-            echo "    HostkeyAlgorithms +ssh-rsa,ssh-dss" >> ~/.ssh/config
-            echo "    PubkeyAcceptedAlgorithms +ssh-rsa,ssh-dss" >> ~/.ssh/config
-            cat ~/.ssh/known_hosts
-
     - name: Deploy files to server
       run: |
-        sudo -u www-data rsync -avz --delete-after --exclude='.git' --exclude='.github' ./ ubuntu@52.66.20.249:/var/www/html/UserManagement/
+        rsync -avz --delete-after --exclude='.git' --exclude='.github' ./ ubuntu@52.66.20.249:/var/www/html/UserManagement/
 
     - name: Restart Apache2 service
       run: |
-        ssh ubuntu@52.66.20.249 "sudo systemctl restart apache2"
+        ssh -o StrictHostKeyChecking=no ubuntu@52.66.20.249 "sudo systemctl restart apache2"
