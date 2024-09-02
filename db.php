@@ -12,6 +12,6 @@ if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
-// echo "Connected successfully to the database!";
+echo "Connected successfully to the database!";
 
 ?>
