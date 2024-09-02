@@ -26,7 +26,7 @@ jobs:
 
     - name: Deploy files to server
       run: |
-        rsync -avz --delete-after --exclude='.git' ./ php-api/ ubuntu@52.66.20.249:/var/www/html/UserManagement/
+        rsync -avz --delete-after --exclude='.git' ./ ubuntu@52.66.20.249:/var/www/html/UserManagement/
 
     - name: Restart Apache2 service
       run: |
