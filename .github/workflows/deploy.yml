@@ -1,29 +1,33 @@
-name: PHP CI Pipeline
+name: Deploy PHP API to Apache2 Server
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 'latest'
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy
-        run: |
-          echo "Deploying to Apache server..."
-          rsync -avz --delete-after --exclude='.git' ./ ubuntu@${{ secrets.SERVER_IP }}:/var/www/html/UserManagement/
-    env:
-      SERVER_IP: ${{ secrets.SERVER_IP }}
+    - name: Add SSH host key
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H 52.66.20.249 >> ~/.ssh/known_hosts
+        cat ~/.ssh/known_hosts
+
+    - name: Deploy files to server
+      run: |
+        rsync -avz --delete-after --exclude='.git' --exclude='.github' ./ ubuntu@52.66.20.249:/var/www/html/UserManagement/
+
+    - name: Restart Apache2 service
+      run: |
+        ssh ubuntu@52.66.20.249 "sudo systemctl restart apache2"
